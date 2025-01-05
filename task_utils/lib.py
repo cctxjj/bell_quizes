@@ -225,9 +225,13 @@ class Hint:
         hint_button.on_click(on_click)
         display(widgets.HBox([hint_button, hint_text]))
 
+<<<<<<< HEAD
+# Todo: Maybe remove unnecessary return f funcs for on_button_click
+=======
 
 # Todo: Maybe remove unnecessary return f funcs for on_button_click
 # Todo: Add design, colors, visual difference between options
+>>>>>>> 6290ffe2bdb66b464b443939aab462c5e3774572
 class OrderTask:
     def __init__(self,
                  question: str,
@@ -312,6 +316,10 @@ class OrderTask:
                 if self.correct_order[i] != boxes[i].children[0].value:
                     corr = False
                     break
+<<<<<<< HEAD
+
+=======
+>>>>>>> 6290ffe2bdb66b464b443939aab462c5e3774572
             if corr:
                 b.style.button_color = 'green'
                 b.disabled = True
@@ -324,5 +332,12 @@ class OrderTask:
                     time.sleep(0.5)
                     b.style.button_color = 'grey'
                     time.sleep(0.5)
+<<<<<<< HEAD
+                
+        checkbutton.on_click(check)
+        
+        
+=======
 
         checkbutton.on_click(check)
+>>>>>>> 6290ffe2bdb66b464b443939aab462c5e3774572
