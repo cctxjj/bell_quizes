@@ -193,171 +193,9 @@ class SingleChoice:
 
 # Todo: add option to add hints
 
-class ButtonedMultipleChoice:
-    def __init__(self,
-                 question: str,
-                 correct_results: list,
-                 false_results: list,
-                 items_per_row: int = 2,
-                 instant_create: bool = True):
-        self.question = question
-        self.correct_results = correct_results
-        self.false_results = false_results
-        self.items_per_row = items_per_row
-        self.answers = [*correct_results, *false_results]
-        random.shuffle(self.answers)
-        if instant_create:
-            self.create()
-
-    def create(self):
-
-        instruction = widgets.HTML(value=self.question)
-        display(instruction)
-
-        answer_buttons = {}
-        for option in self.answers:
-            # Todo: maybe redo design, change to
-            cb: widgets.Button = widgets.Button()
-            cb.description = option
-            cb.style.button_color = "grey"
-            cb.layout = {"border": "2px solid grey"}
-            cb.selected = False
-            def select(b):
-                if b.selected:
-                    b.layout = {"border": "2px solid grey"}
-                    b.style.button_color = "grey"
-                    b.selected = False
-                else:
-                    b.layout = {"border": "3px solid green"}
-                    b.style.button_color = "darkgreen"
-                    b.selected = True
-
-            cb.on_click(select)
-            answer_buttons[cb] = option in self.correct_results
-
-        layout_answers = []
-        for i in range(0, len(list(answer_buttons.keys())), self.items_per_row):
-            answers_in_line = []
-            for x in range(self.items_per_row):
-                try:
-                    answers_in_line.append(list(answer_buttons.keys())[i + x])
-                except IndexError:
-                    break
-            layout_answers.append(widgets.HBox(answers_in_line))
-        container = widgets.VBox(layout_answers)
-        display(container)
-
-        checkbutton: widgets.Button = widgets.Button(description='Prüfen', )
-        checkbutton.style.button_color = 'grey'
-
-        display(checkbutton)
-        def check(b):
-            corr = True
-            for button, target_result in answer_buttons.items():
-                if button.selected != target_result:
-                    corr = False
-                    break
-            if corr:
-                b.style.button_color = 'green'
-                b.disabled = True
-                b.description = "Richtig!"
-                for checkbox in answer_buttons.keys():
-                    checkbox.disabled = True
-
-            else:
-                for ignored in range(2):
-                    b.style.button_color = 'red'
-                    time.sleep(0.5)
-                    b.style.button_color = 'grey'
-                    time.sleep(0.5)
-            return check
-
-        checkbutton.on_click(check)
-
-
-class ButtonedSingleChoice:
-    def __init__(self,
-                 question: str,
-                 correct_result: str,
-                 false_results: list,
-                 items_per_row: int = 2,
-                 instant_create: bool = True):
-        self.question = question
-        self.correct_result = correct_result
-        self.false_results = false_results
-        self.items_per_row = items_per_row
-        self.answers = [correct_result, *false_results]
-        random.shuffle(self.answers)
-        if instant_create:
-            self.create()
-
-    def create(self):
-
-        instruction = widgets.HTML(value=self.question)
-        display(instruction)
-
-        answer_buttons = {}
-        for option in self.answers:
-            cb: widgets.Button = widgets.Button()
-            cb.description = option
-            cb.style.button_color = "grey"
-            cb.layout = {"border": "2px solid grey"}
-            cb.selected = False
-            def select(b):
-                if b.selected:
-                    b.layout = {"border": "2px solid grey"}
-                    b.style.button_color = "grey"
-                    b.selected = False
-                else:
-                    for button_to_correct in answer_buttons.keys():
-                        button_to_correct.layout = {"border": "2px solid grey"}
-                        button_to_correct.style.button_color = "grey"
-                        button_to_correct.selected = False
-                    b.layout = {"border": "2px solid green"}
-                    b.style.button_color = "darkgreen"
-                    b.selected = True
-
-            cb.on_click(select)
-            answer_buttons[cb] = option == self.correct_result
-
-        layout_answers = []
-        for i in range(0, len(list(answer_buttons.keys())), self.items_per_row):
-            answers_in_line = []
-            for x in range(self.items_per_row):
-                try:
-                    answers_in_line.append(list(answer_buttons.keys())[i + x])
-                except IndexError:
-                    break
-            layout_answers.append(widgets.HBox(answers_in_line))
-        container = widgets.VBox(layout_answers)
-        display(container)
-
-        checkbutton: widgets.Button = widgets.Button(description='Prüfen', )
-        checkbutton.style.button_color = 'grey'
-
-        display(checkbutton)
-        def check(b):
-            corr = True
-            for button, target_result in answer_buttons.items():
-                if button.selected != target_result:
-                    corr = False
-                    break
-            if corr:
-                b.style.button_color = 'green'
-                b.disabled = True
-                b.description = "Richtig!"
-                for checkbox in answer_buttons.keys():
-                    checkbox.disabled = True
-
-            else:
-                for ignored in range(2):
-                    b.style.button_color = 'red'
-                    time.sleep(0.5)
-                    b.style.button_color = 'grey'
-                    time.sleep(0.5)
-            return check
-
-        checkbutton.on_click(check)
+class SingeChoiceButtoned:
+    pass
+    # TODO
 
 
 class Hint:
@@ -390,6 +228,7 @@ class Hint:
 
 # Todo: Maybe remove unnecessary return f funcs for on_button_click
 # Todo: Add design, colors, visual difference between options
+
 class OrderTask:
     def __init__(self,
                  question: str,
@@ -474,7 +313,6 @@ class OrderTask:
                 if self.correct_order[i] != boxes[i].children[0].value:
                     corr = False
                     break
-                    
             if corr:
                 b.style.button_color = 'green'
                 b.disabled = True
@@ -487,6 +325,9 @@ class OrderTask:
                     time.sleep(0.5)
                     b.style.button_color = 'grey'
                     time.sleep(0.5)
+
+        checkbutton.on_click(check)
+
 
 class DropdownText:
     def __init__(self,
