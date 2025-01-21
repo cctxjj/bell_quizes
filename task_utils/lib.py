@@ -191,7 +191,6 @@ class SingleChoice:
         checkbutton.on_click(check)
 
 
-# Todo: add option to add hints
 
 class ButtonedMultipleChoice:
     def __init__(self,
