@@ -1,9 +1,48 @@
+import threading
 import time
 
 from IPython.core.display_functions import display
 
 import ipywidgets as widgets
 import random
+
+
+class Checkbutton:
+    def __init__(self,
+                 condition,
+                 reaction_correct=None,
+                 elements_to_disable=None):
+        checkbutton = widgets.Button(description='Prüfen', disabled=False)
+        checkbutton.style.button_color = 'grey'
+
+        display(checkbutton)
+        self.is_blinking = False
+
+        def check(b):
+            if condition():
+                b.style.button_color = 'green'
+                b.disabled = True
+                b.description = "Richtig!"
+                if reaction_correct is not None:
+                    reaction_correct()
+                if elements_to_disable is not None:
+                    for element in elements_to_disable:
+                        element.disabled = True
+            else:
+                def blink_red():
+                    if self.is_blinking:
+                        return
+                    self.is_blinking = True
+                    for ignored in range(2):
+                        b.style.button_color = 'red'
+                        time.sleep(0.5)
+                        b.style.button_color = 'grey'
+                        time.sleep(0.5)
+                    self.is_blinking = False
+
+                threading.Thread(target=blink_red).start()
+
+        checkbutton.on_click(check)
 
 
 class SimpleInput:
@@ -23,27 +62,13 @@ class SimpleInput:
                                description='Antwort: ',
                                disabled=False)
         instruction = widgets.HTML(value=self.question)
-        checkbutton = widgets.Button(description='Prüfen', disabled=False)
-        checkbutton.style.button_color = 'grey'
+
         display(instruction)
         display(textbox)
 
-        display(checkbutton)
-
-        def check(b):
-            if textbox.value.strip().replace(" ", '').lower() == self.target_result.strip().replace(" ", '').lower():
-                b.style.button_color = 'green'
-                b.disabled = True
-                textbox.disabled = True
-                b.description = "Richtig!"
-            else:
-                for ignored in range(2):
-                    b.style.button_color = 'red'
-                    time.sleep(0.5)
-                    b.style.button_color = 'grey'
-                    time.sleep(0.5)
-
-        checkbutton.on_click(check)
+        def is_correct():
+            return textbox.value.strip().replace(" ", '').lower() == self.target_result.strip().replace(" ", '').lower()
+        Checkbutton(is_correct, None, [textbox])
 
 
 class MultipleChoice:
@@ -85,33 +110,15 @@ class MultipleChoice:
         container = widgets.VBox(layout_answers)
         display(container)
 
-        checkbutton: widgets.Button = widgets.Button(description='Prüfen', )
-        checkbutton.style.button_color = 'grey'
-
-        display(checkbutton)
-
-        def check(b):
+        def is_correct():
             corr = True
             for checkbox, target_result in answer_buttons.items():
-                if not checkbox.value == target_result:
+                if checkbox.value != target_result:
                     corr = False
                     break
-            if corr:
-                b.style.button_color = 'green'
-                b.disabled = True
-                b.description = "Richtig!"
-                for checkbox in answer_buttons.keys():
-                    checkbox.disabled = True
+            return corr
+        Checkbutton(is_correct, None, answer_buttons.keys())
 
-            else:
-                for ignored in range(2):
-                    b.style.button_color = 'red'
-                    time.sleep(0.5)
-                    b.style.button_color = 'grey'
-                    time.sleep(0.5)
-            return check
-
-        checkbutton.on_click(check)
 
 
 class SingleChoice:
@@ -150,7 +157,7 @@ class SingleChoice:
 
         for button in answer_buttons.keys():
             button.observe(on_checkbox_tick, 'value')
-        # TODO: Convert button to reusable method
+
         layout_answers = []
         for i in range(0, len(list(answer_buttons.keys())), self.items_per_row):
             answers_in_line = []
@@ -163,32 +170,15 @@ class SingleChoice:
         container = widgets.VBox(layout_answers)
         display(container)
 
-        checkbutton: widgets.Button = widgets.Button(description='Prüfen', )
-        checkbutton.style.button_color = 'grey'
-
-        display(checkbutton)
-
-        def check(b):
+        def is_correct():
             corr = True
             for checkbox, target_result in answer_buttons.items():
-                if not checkbox.value == target_result:
+                if checkbox.value != target_result:
                     corr = False
                     break
-            if corr:
-                b.style.button_color = 'green'
-                b.disabled = True
-                b.description = "Richtig!"
-                for checkbox in answer_buttons.keys():
-                    checkbox.disabled = True
-            else:
-                for ignored in range(2):
-                    b.style.button_color = 'red'
-                    time.sleep(0.5)
-                    b.style.button_color = 'grey'
-                    time.sleep(0.5)
-            return check
+            return corr
 
-        checkbutton.on_click(check)
+        Checkbutton(is_correct, None, answer_buttons.keys())
 
 
 class ButtonedMultipleChoice:
@@ -245,32 +235,15 @@ class ButtonedMultipleChoice:
         container = widgets.VBox(layout_answers)
         display(container)
 
-        checkbutton: widgets.Button = widgets.Button(description='Prüfen', )
-        checkbutton.style.button_color = 'grey'
-
-        display(checkbutton)
-        def check(b):
+        def is_correct():
             corr = True
             for button, target_result in answer_buttons.items():
                 if button.selected != target_result:
                     corr = False
                     break
-            if corr:
-                b.style.button_color = 'green'
-                b.disabled = True
-                b.description = "Richtig!"
-                for checkbox in answer_buttons.keys():
-                    checkbox.disabled = True
+            return corr
 
-            else:
-                for ignored in range(2):
-                    b.style.button_color = 'red'
-                    time.sleep(0.5)
-                    b.style.button_color = 'grey'
-                    time.sleep(0.5)
-            return check
-
-        checkbutton.on_click(check)
+        Checkbutton(is_correct, None, answer_buttons.keys())
 
 
 class ButtonedSingleChoice:
@@ -330,32 +303,15 @@ class ButtonedSingleChoice:
         container = widgets.VBox(layout_answers)
         display(container)
 
-        checkbutton: widgets.Button = widgets.Button(description='Prüfen', )
-        checkbutton.style.button_color = 'grey'
-
-        display(checkbutton)
-        def check(b):
+        def is_correct():
             corr = True
             for button, target_result in answer_buttons.items():
                 if button.selected != target_result:
                     corr = False
                     break
-            if corr:
-                b.style.button_color = 'green'
-                b.disabled = True
-                b.description = "Richtig!"
-                for checkbox in answer_buttons.keys():
-                    checkbox.disabled = True
+            return corr
 
-            else:
-                for ignored in range(2):
-                    b.style.button_color = 'red'
-                    time.sleep(0.5)
-                    b.style.button_color = 'grey'
-                    time.sleep(0.5)
-            return check
-
-        checkbutton.on_click(check)
+        Checkbutton(is_correct, None, answer_buttons.keys())
 
 
 class Hint:
@@ -461,32 +417,15 @@ class OrderTask:
         main_container = widgets.VBox(boxes)
         display(main_container)
 
-        checkbutton: widgets.Button = widgets.Button(description='Prüfen', )
-        checkbutton.style.button_color = 'grey'
-
-        display(checkbutton)
-
-        def check(b):
+        def is_correct():
             corr = True
             for i in range(len(self.correct_order)):
                 if self.correct_order[i] != boxes[i].children[0].value:
                     corr = False
                     break
+            return corr
+        Checkbutton(is_correct, None, button_text_rel.keys())
 
-            if corr:
-                b.style.button_color = 'green'
-                b.disabled = True
-                b.description = "Richtig!"
-                for b in list(button_text_rel.keys()):
-                    b.disabled = True
-            else:
-                for ignored in range(2):
-                    b.style.button_color = 'red'
-                    time.sleep(0.5)
-                    b.style.button_color = 'grey'
-                    time.sleep(0.5)
-
-        checkbutton.on_click(check)
 
 
 class DropdownText:
@@ -533,30 +472,14 @@ class DropdownText:
         final_hbox = widgets.HBox(elements, layout=widgets.Layout(flex_flow="wrap"))
         display(final_hbox)
 
-        checkbutton: widgets.Button = widgets.Button(description='Prüfen', )
-        checkbutton.style.button_color = 'grey'
-
-        display(checkbutton)
-
-        def check(b):
+        def is_correct():
             corr = True
             for element in choice_elements.keys():
                 if element.value != choice_elements[element]:
                     corr = False
                     break
-            if corr:
-                b.style.button_color = 'green'
-                b.disabled = True
-                b.description = "Richtig!"
-                for dd in list(choice_elements.keys()):
-                    dd.disabled = True
-            else:
-                for ignored in range(2):
-                    b.style.button_color = 'red'
-                    time.sleep(0.5)
-                    b.style.button_color = 'grey'
-                    time.sleep(0.5)
-        checkbutton.on_click(check)
+            return corr
+        Checkbutton(is_correct, None, list(choice_elements.keys()))
 
 
 
@@ -604,29 +527,13 @@ class AnswerboxText:
         final_hbox = widgets.HBox(elements, layout=widgets.Layout(flex_flow="wrap"))
         display(final_hbox)
 
-        checkbutton: widgets.Button = widgets.Button(description='Prüfen', )
-        checkbutton.style.button_color = 'grey'
-
-        display(checkbutton)
-
-        def check(b):
+        def is_correct():
             corr = True
             for element in textbox_elements.keys():
                 if element.value != textbox_elements[element]:
                     corr = False
                     break
-            if corr:
-                b.style.button_color = 'green'
-                b.disabled = True
-                b.description = "Richtig!"
-                for dd in list(textbox_elements.keys()):
-                    dd.disabled = True
-            else:
-                for ignored in range(2):
-                    b.style.button_color = 'red'
-                    time.sleep(0.5)
-                    b.style.button_color = 'grey'
-                    time.sleep(0.5)
-        checkbutton.on_click(check)
+            return corr
+        Checkbutton(is_correct, None, textbox_elements.keys())
 
 
