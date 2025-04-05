@@ -6,6 +6,8 @@ from IPython.core.display_functions import display
 import ipywidgets as widgets
 import random
 
+# design of the elements realised party with the help of ChatGPT (formating/styling buttons, suggesting colors etc.)
+# version used: ChatGPT-4-turbo, accessible through: https://chatgpt.com/ (last access date: 5th april 2025)
 
 class Checkbutton:
     def __init__(self,

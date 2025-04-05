@@ -146,7 +146,8 @@ class VG:
     def errechne_kurvenpunkt(self, points, t):
         points_x, points_y = [p[0] for p in points], [p[1] for p in points]
         return self.de_casteljau(points_x, t), self.de_casteljau(points_y, t)
-        
+
+    # function inspired by https://vectorlinux.com/de-casteljau-algorithm-python/ (last access date: 5th april 2025)
     def de_casteljau(self, control_points, t):
         # function calculating one point on the curve according to t, recursive
         if not 0 < t < 1:
