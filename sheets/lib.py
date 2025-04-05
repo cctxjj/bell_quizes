@@ -12,15 +12,28 @@ class Checkbutton:
                  condition,
                  reaction_correct=None,
                  elements_to_disable=None):
-        checkbutton = widgets.Button(description='Prüfen', disabled=False)
-        checkbutton.style.button_color = 'grey'
-
+        checkbutton = widgets.Button(
+            description="Prüfen",
+            style={"button_color": "#87CEFA"},  # Farbe setzen
+            layout=widgets.Layout(
+                width="120px", 
+                height="40px",  
+                border="none",  
+                border_radius="12px",  
+                font_weight="bold",  
+                font_size="20px",  
+                font_family="Arial",
+                box_shadow="2px 2px 5px rgba(0, 0, 0, 0.2)", 
+                margin="0px 0px 30px 0px"
+            )
+        )
+        
         display(checkbutton)
         self.is_blinking = False
 
         def check(b):
             if condition():
-                b.style.button_color = 'green'
+                b.style.button_color = "#90EE90"
                 b.disabled = True
                 b.description = "Richtig!"
                 if reaction_correct is not None:
@@ -34,15 +47,16 @@ class Checkbutton:
                         return
                     self.is_blinking = True
                     for ignored in range(2):
-                        b.style.button_color = 'red'
+                        b.style.button_color = "#FF7F7F"
                         time.sleep(0.5)
-                        b.style.button_color = 'grey'
+                        b.style.button_color = "#87CEFA"
                         time.sleep(0.5)
                     self.is_blinking = False
 
                 threading.Thread(target=blink_red).start()
 
         checkbutton.on_click(check)
+        Line()
 
 
 class SimpleInput:
@@ -60,7 +74,10 @@ class SimpleInput:
         textbox = widgets.Text(value='',
                                placeholder='Hier eingeben',
                                description='Antwort: ',
-                               disabled=False)
+                               disabled=False,
+                              layout=widgets.Layout(
+                                    margin="0px 0px 15px 0px"
+                                ))
         instruction = widgets.HTML(value=self.question)
 
         display(instruction)
@@ -203,21 +220,29 @@ class ButtonedMultipleChoice:
         display(instruction)
 
         answer_buttons = {}
+        len_buttons = f"{len(max(self.answers)) * 12 + 50}px"
         for option in self.answers:
-            # Todo: maybe redo design, change to
-            cb: widgets.Button = widgets.Button()
-            cb.description = option
-            cb.style.button_color = "grey"
-            cb.layout = {"border": "2px solid grey"}
+            cb: widgets.Button = widgets.Button(
+                description=option,
+                style={"button_color": "#D3D3D3"},  
+                layout=widgets.Layout(
+                    width=len_buttons,
+                    height="50px",  
+                    border="none",  
+                    border_radius="12px",  
+                    font_weight="bold",  
+                    font_size="16px",  
+                    padding="10px",  
+                    margin="5px"
+                )
+            )
             cb.selected = False
             def select(b):
                 if b.selected:
-                    b.layout = {"border": "2px solid grey"}
-                    b.style.button_color = "grey"
+                    b.layout.border = "none"
                     b.selected = False
                 else:
-                    b.layout = {"border": "3px solid green"}
-                    b.style.button_color = "darkgreen"
+                    b.layout.border = "4px solid #0056b3"
                     b.selected = True
 
             cb.on_click(select)
@@ -268,24 +293,32 @@ class ButtonedSingleChoice:
         display(instruction)
 
         answer_buttons = {}
+        len_buttons = f"{len(max(self.answers)) * 12 + 50}px"
         for option in self.answers:
-            cb: widgets.Button = widgets.Button()
-            cb.description = option
-            cb.style.button_color = "grey"
-            cb.layout = {"border": "2px solid grey"}
+            cb: widgets.Button = widgets.Button(
+                description=option,
+                style={"button_color": "#D3D3D3"},  
+                layout=widgets.Layout(
+                    width=len_buttons,
+                    height="50px",  
+                    border="none",  
+                    border_radius="12px",  
+                    font_weight="bold",  
+                    font_size="16px",  
+                    padding="10px",  
+                    margin="5px"
+                )
+            )
             cb.selected = False
             def select(b):
                 if b.selected:
-                    b.layout = {"border": "2px solid grey"}
-                    b.style.button_color = "grey"
+                    b.layout.border = "#D3D3D3"
                     b.selected = False
                 else:
                     for button_to_correct in answer_buttons.keys():
-                        button_to_correct.layout = {"border": "2px solid grey"}
-                        button_to_correct.style.button_color = "grey"
+                        b.layout.border = "#D3D3D3"
                         button_to_correct.selected = False
-                    b.layout = {"border": "2px solid green"}
-                    b.style.button_color = "darkgreen"
+                    b.layout.border = "4px solid #0056b3"
                     b.selected = True
 
             cb.on_click(select)
@@ -371,8 +404,26 @@ class OrderTask:
         box_text_rel = {}
         button_text_rel = {}
         for element in self.items:
-            button_up: widgets.Button = widgets.Button(description="hoch")
-            button_down = widgets.Button(description="runter")
+            button_up: widgets.Button = widgets.Button(description="↑",
+                                                            style={"button_color": "#D3D3D3"},  
+                                                            layout=widgets.Layout(
+                                                                width="60px",
+                                                                height="25px",  
+                                                                border="none",  
+                                                                border_radius="12px",  
+                                                                font_weight="bold",  
+                                                                font_size="25px"
+                                                            ))
+            button_down = widgets.Button(description="↓",
+                                        style={"button_color": "#D3D3D3"},  
+                                        layout=widgets.Layout(
+                                        width="60px",
+                                        height="25px",  
+                                        border="none",  
+                                        border_radius="12px",  
+                                        font_weight="bold",  
+                                        font_size="25px"
+                                        ))
 
             def up(b):
                 for index, item in enumerate(boxes):
@@ -406,10 +457,27 @@ class OrderTask:
 
             button_container = widgets.VBox([button_up, button_down])
 
-            text: widgets.HTML = widgets.HTML(value=element,
-                                              layout={"border": "1px solid " + self.color, "width": self.width,
-                                                      "height": "60px"})
-
+            text: widgets.HTML = widgets.HTML(
+                                            f"""
+                                            <div style="
+                                                display: flex;
+                                                justify-content: center;
+                                                align-items: center;
+                                                width: 100%;
+                                                padding: 10px;
+                                                background-color: #f4f4f4;
+                                                border-radius: 8px;
+                                                box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+                                                font-family: 'Arial', sans-serif;
+                                                font-size: 14px;
+                                                color: #333;
+                                                margin-bottom: 15px;
+                                            ">
+                                                <strong>{element}</strong>
+                                            </div>
+                                            """
+                                        )
+            text.actual_value = element
             main_box: widgets.HBox = widgets.HBox([text, button_container])
             box_text_rel[main_box] = element
             boxes.append(main_box)
@@ -420,7 +488,7 @@ class OrderTask:
         def is_correct():
             corr = True
             for i in range(len(self.correct_order)):
-                if self.correct_order[i] != boxes[i].children[0].value:
+                if self.correct_order[i] != boxes[i].children[0].actual_value:
                     corr = False
                     break
             return corr
@@ -536,4 +604,7 @@ class AnswerboxText:
             return corr
         Checkbutton(is_correct, None, textbox_elements.keys())
 
-
+class Line():
+    def __init__(self):
+        line = widgets.HTML("<hr style='border:1px solid #ccc; margin:10px 0;'>")
+        display(line)
