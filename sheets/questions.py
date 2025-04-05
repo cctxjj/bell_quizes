@@ -1,3 +1,5 @@
+from IPython.core.display_functions import display
+
 from sheets import lib
 from ipycanvas import Canvas
 import ipywidgets as wd
@@ -49,7 +51,8 @@ class PG:
         return lib.OrderTask("Sortiere die einzelnen Schritte im Bresenham-Algorithmus", ["Startpunkt und Endpunkt (x und y) sind gegeben", "Betrachtung des Pixels rechts vom aktuellen Bildpunkt (Ausgangspunkt)", "Fehlererrechnung - Abweichung von der Ideallinie wird ermittelt", "Fallunterscheidung in Abhängigkeit vom Fehler, Verschiebung nach oben falls nötig", "Pixel wird ausgemalt"])
 
     def stelle_dar(self, pixel_x, pixel_y, color="black"):
-        if self.canvas == None:
+        # function used to display bresenham algorithm
+        if self.canvas is None:
             self.canvas = Canvas(width=210, height=210)
             display(self.canvas)
         self.canvas.fill_sytle = color
@@ -79,8 +82,9 @@ class VG:
     def question_4(self):
         return lib.ButtonedMultipleChoice("Welches Dateiformat gehört zur Vektorgrafik?", [".svg"], [".bmp", ".jpg", ".png"], 2)
     
-    def print_rect(self, breite, höhe, x, y, farbe="#Ff0000"):
-        if self.canvas == None:
+    def print_rect(self, breite, hoehe, x, y, farbe="#Ff0000"):
+        # function to display a rectangle according to given attributes
+        if self.canvas is None:
             self.canvas = Canvas(width=800, height=400)
         self.canvas.clear()
         display(self.canvas)
@@ -88,21 +92,21 @@ class VG:
             self.canvas.fill_style = farbe
         except Exception:
             pass
-        self.canvas.fill_rect(x=x, y=self.canvas.height-(y+höhe), width=breite, height=höhe)
+        self.canvas.fill_rect(x=x, y=self.canvas.height-(y + hoehe), width=breite, height=hoehe)
 
     def adjustable_rect(self):
         wd.interact(self.print_rect, breite=(0, 400, 20), höhe=(0, 200, 20), x=(0, 400, 20), y=(0, 200, 20))
 
     def stelle_punkte_dar(self, points, step, color="blue"):
         dspl = True
-        if self.ax == None:
+        if self.ax is None:
             dspl = False
             self.fig, self.ax = plt.subplots()
             self.ax.set_xlabel('x-Achse')
             self.ax.set_ylabel('y-Achse')
             
         x, y = zip(*points)
-        # Punkte plotten
+        # plotting points
         self.ax.set_title(f'Visualisierung der {step}-Punkte (mit Matplotlib)')
         self.ax.scatter(x, y, color=color, label='Punkte')
         self.ax.plot(x, y, color=color, label='Punkte')
@@ -114,22 +118,22 @@ class VG:
         x, y = zip(*points)
         x_s, y_s = zip(*starting_points)
 
-        # Punkte plotten
         ax.scatter(x, y, color=color_1)
         ax.scatter(x_s, y_s, color=color_2)
         ax.plot(x_s, y_s, color=color_2)
-        
-        # Achsenbeschriftungen
+
         ax.set_xlabel('x-Achse')
         ax.set_ylabel('y-Achse')
-        
-        # Titel und Legende
+
         ax.set_title('Punkt-Darstellung mit Matplotlib')
         
         
 
     def teiler_punkte(self, points, t):
         new_points_x = []
+        if not 0 < t < 1:
+            t = 0.5
+            print("t größer 1 bzw. kleiner 0 --> t auf 0.5 angepasst")
         for i in range(len(points) - 1):
             new_point = (1 - t) * points[i][0] + t * points[i + 1][0]
             new_points_x.append(new_point)
@@ -144,32 +148,35 @@ class VG:
         return self.de_casteljau(points_x, t), self.de_casteljau(points_y, t)
         
     def de_casteljau(self, control_points, t):
+        # function calculating one point on the curve according to t, recursive
+        if not 0 < t < 1:
+            raise
         if len(list(control_points)) == 1:
             return control_points[0]
         else:
             new_points = []
             for i in range(len(control_points) - 1):
-                new_point = (1 - t) * control_points[i] + t * control_points[i + 1]
+                new_point = control_points[i] + t*(control_points[i+1]-control_points[i])
                 new_points.append(new_point)
         return self.de_casteljau(new_points, t)
         
                 
 
 class Rechteck:
-    def __init__(self, breite, höhe, x, y, farbe):
+    def __init__(self, breite, hoehe, x, y, farbe):
         self.breite = breite
-        self.höhe = höhe
+        self.hoehe = hoehe
         self.x = x
         self.y = y
         self.farbe = farbe
         self.canvas = None
 
     def anzeigen(self):
-        if self.canvas == None:
-            self.canvas = Canvas(width=max(self.breite+self.x, 100), height=max(self.höhe+self.y, 100))
+        if self.canvas is None:
+            self.canvas = Canvas(width=max(self.breite+self.x, 100), height=max(self.hoehe+self.y, 100))
             display(self.canvas)
         self.canvas.fill_style = self.farbe
-        self.canvas.fill_rect(x=self.x, y=self.canvas.height-(self.y+self.höhe), width=self.breite, height=self.höhe)
+        self.canvas.fill_rect(x=self.x, y=self.canvas.height-(self.y+self.hoehe), width=self.breite, height=self.hoehe)
         
 
 

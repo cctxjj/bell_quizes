@@ -12,9 +12,10 @@ class Checkbutton:
                  condition,
                  reaction_correct=None,
                  elements_to_disable=None):
+        # class to create an abstract checkbutton, to be used whenever any check is required
         checkbutton = widgets.Button(
             description="Prüfen",
-            style={"button_color": "#87CEFA"},  # Farbe setzen
+            style={"button_color": "#87CEFA"},
             layout=widgets.Layout(
                 width="120px", 
                 height="40px",  
@@ -31,6 +32,7 @@ class Checkbutton:
         display(checkbutton)
         self.is_blinking = False
 
+        # function to be executed for checking if result is correct --> checking for condition (given through constructor)
         def check(b):
             if condition():
                 b.style.button_color = "#90EE90"
@@ -42,6 +44,7 @@ class Checkbutton:
                     for element in elements_to_disable:
                         element.disabled = True
             else:
+                # displaying false result, using multithreading to avoid system blocking when using time.sleep()
                 def blink_red():
                     if self.is_blinking:
                         return
@@ -64,6 +67,7 @@ class SimpleInput:
                  question: str,
                  target_result: str,
                  instant_create: bool = True):
+        # basic text input field to type in an answer
         self.question = question
         self.target_result = target_result
         if instant_create:
@@ -95,6 +99,7 @@ class MultipleChoice:
                  false_results: list,
                  items_per_row: int = 2,
                  instant_create: bool = True):
+        # multiple choice question using checkboxes, items per row adaptable
         self.question = question
         self.correct_results = correct_results
         self.false_results = false_results
@@ -109,15 +114,15 @@ class MultipleChoice:
         instruction = widgets.HTML(value=self.question)
         display(instruction)
 
-        answer_buttons = {}
+        answer_buttons = {} # map to store checkboxes and correct result
         for option in self.answers:
             cb: widgets.Checkbox = widgets.Checkbox()
             cb.description = option
             answer_buttons[cb] = option in self.correct_results
 
-        layout_answers = []
+        layout_answers = [] # list of horizontal boxes with vertically arranged options
         for i in range(0, len(list(answer_buttons.keys())), self.items_per_row):
-            answers_in_line = []
+            answers_in_line = [] # list containing question widgets in current line
             for x in range(self.items_per_row):
                 try:
                     answers_in_line.append(list(answer_buttons.keys())[i + x])
@@ -145,6 +150,7 @@ class SingleChoice:
                  false_results: list,
                  items_per_row: int = 2,
                  instant_create: bool = True):
+        # quiz to offer multiple options, the difference being that only one can be correct --> differing behavior when checking one box
         self.question = question
         self.correct_result = correct_result
         self.false_results = false_results
@@ -159,12 +165,13 @@ class SingleChoice:
         instruction = widgets.HTML(value=self.question)
         display(instruction)
 
-        answer_buttons = {}
+        answer_buttons = {} # map to store checkboxes and correct result
         for option in self.answers:
             cb: widgets.Checkbox = widgets.Checkbox()
             cb.description = option
             answer_buttons[cb] = option == self.correct_result
 
+        # function for unchecking any box that is checked when another checkbox is clicked
         def on_checkbox_tick(info):
             if not info["new"]:
                 return
@@ -175,9 +182,9 @@ class SingleChoice:
         for button in answer_buttons.keys():
             button.observe(on_checkbox_tick, 'value')
 
-        layout_answers = []
+        layout_answers = [] # list of horizontal boxes with vertically arranged options
         for i in range(0, len(list(answer_buttons.keys())), self.items_per_row):
-            answers_in_line = []
+            answers_in_line = [] # list containing question widgets in current line
             for x in range(self.items_per_row):
                 try:
                     answers_in_line.append(list(answer_buttons.keys())[i + x])
@@ -205,6 +212,7 @@ class ButtonedMultipleChoice:
                  false_results: list,
                  items_per_row: int = 2,
                  instant_create: bool = True):
+        # quiz offering multiple correct and false answers to one question, designed with buttons (instead of checkboxes)
         self.question = question
         self.correct_results = correct_results
         self.false_results = false_results
@@ -219,7 +227,7 @@ class ButtonedMultipleChoice:
         instruction = widgets.HTML(value=self.question)
         display(instruction)
 
-        answer_buttons = {}
+        answer_buttons = {} # map to store checkboxes and correct result
         len_buttons = f"{len(max(self.answers)) * 12 + 50}px"
         for option in self.answers:
             cb: widgets.Button = widgets.Button(
@@ -248,9 +256,9 @@ class ButtonedMultipleChoice:
             cb.on_click(select)
             answer_buttons[cb] = option in self.correct_results
 
-        layout_answers = []
+        layout_answers = [] # list of horizontal boxes with vertically arranged options
         for i in range(0, len(list(answer_buttons.keys())), self.items_per_row):
-            answers_in_line = []
+            answers_in_line = [] # list containing question widgets in current line
             for x in range(self.items_per_row):
                 try:
                     answers_in_line.append(list(answer_buttons.keys())[i + x])
@@ -278,6 +286,7 @@ class ButtonedSingleChoice:
                  false_results: list,
                  items_per_row: int = 2,
                  instant_create: bool = True):
+        # quiz offering multiple answers (one being correct --> differing in behaviour) to a given question, designed using buttons (instead of checkboxes)
         self.question = question
         self.correct_result = correct_result
         self.false_results = false_results
@@ -292,7 +301,7 @@ class ButtonedSingleChoice:
         instruction = widgets.HTML(value=self.question)
         display(instruction)
 
-        answer_buttons = {}
+        answer_buttons = {} # map to store checkboxes and correct result
         len_buttons = f"{len(max(self.answers)) * 12 + 50}px"
         for option in self.answers:
             cb: widgets.Button = widgets.Button(
@@ -324,9 +333,9 @@ class ButtonedSingleChoice:
             cb.on_click(select)
             answer_buttons[cb] = option == self.correct_result
 
-        layout_answers = []
+        layout_answers = [] # list of horizontal boxes with vertically arranged options
         for i in range(0, len(list(answer_buttons.keys())), self.items_per_row):
-            answers_in_line = []
+            answers_in_line = [] # list containing question widgets in current line
             for x in range(self.items_per_row):
                 try:
                     answers_in_line.append(list(answer_buttons.keys())[i + x])
@@ -354,6 +363,8 @@ class Hint:
                  color="grey",
                  color_revealed="olive",
                  instant_create: bool = True):
+        # simple button that reveals a hint when clicked, not designed properly yet
+        # ended up not being used, to be ignored, left in just in case still needed for unpredictable reasons
         self.content = content
         self.name = name
         self.color = color
@@ -375,8 +386,6 @@ class Hint:
         display(widgets.HBox([hint_button, hint_text]))
 
 
-# Todo: Maybe remove unnecessary return f funcs for on_button_click
-# Todo: Add design, colors, visual difference between options
 class OrderTask:
     def __init__(self,
                  question: str,
@@ -384,6 +393,7 @@ class OrderTask:
                  color: str = "aqua",
                  width: str = "300px",
                  instant_create: bool = True):
+        # displays items in random oder, to be sorted in the given order
         self.items = list(set(items))
         self.question = question
         self.width = width
@@ -400,9 +410,9 @@ class OrderTask:
         instruction = widgets.HTML(value=self.question)
         display(instruction)
 
-        boxes = []
-        box_text_rel = {}
-        button_text_rel = {}
+        boxes = [] # list of HBoxes, each of them containing a text widget (one item of the given list) and a VBox with one up and one down button
+        box_text_rel = {} # used for mapping HBoxes to according text widgets
+        button_text_rel = {} # used for mapping up/down buttons to according text widgets
         for element in self.items:
             button_up: widgets.Button = widgets.Button(description="↑",
                                                             style={"button_color": "#D3D3D3"},  
@@ -500,6 +510,7 @@ class DropdownText:
     def __init__(self,
                  text: str,
                  instant_create: bool = True):
+        # a whole text with some gaps that can be filled via dropdown answers
         # Syntax: options in {}, seperated by /; last option is processed as correct result
         self.text = text
 
@@ -507,8 +518,9 @@ class DropdownText:
             self.create()
 
     def create(self):
-        processed_text = []
-        is_multiple_choice = []
+        processed_text = [] # list containing the string elements, seperated by future dropdown elements (in string still in "item1/item2/.../correct_item" form)
+        is_multiple_choice = [] # list keeping track of whether one item in the formated string has to be a dropdown
+        # formating text
         cur = ""
         for letter in self.text:
             if letter == "{" or letter == "}":
@@ -527,7 +539,7 @@ class DropdownText:
 
         elements = []
         choice_elements = {}
-
+        # creating actual text with dropdowns inbetween
         for index in range(len(processed_text)):
             if is_multiple_choice[index]:
                 dropdown: widgets.Dropdown = widgets.Dropdown(options=["_"*len(max(processed_text[index].split("/"))), *processed_text[index].split("/")[0:-1]], value="_"*len(max(processed_text[index].split("/"))), layout=widgets.Layout(width="auto"))
@@ -555,6 +567,7 @@ class AnswerboxText:
     def __init__(self,
                  text: str,
                  instant_create: bool = True):
+        # a whole text with some gaps that can be filled via typing in textboxes
         # Syntax: text with correct answer in {}
         self.text = text
 
@@ -562,8 +575,8 @@ class AnswerboxText:
             self.create()
 
     def create(self):
-        processed_text = []
-        is_textbox = []
+        processed_text = [] # list containing the string elements, seperated by future gap elements
+        is_textbox = [] # list keeping track of whether one item in the formated text is the answer to a gap
         cur = ""
         for letter in self.text:
             if letter == "{" or letter == "}":
@@ -582,7 +595,7 @@ class AnswerboxText:
 
         elements = []
         textbox_elements = {}
-
+        # creating the actual text with textboxes inbetween
         for index in range(len(processed_text)):
             if is_textbox[index]:
                 textbox: widgets.Text = widgets.Text(placeholder="", layout=widgets.Layout(width=str(30 + 10*len(processed_text[index]))+"px"))
@@ -604,7 +617,8 @@ class AnswerboxText:
             return corr
         Checkbutton(is_correct, None, textbox_elements.keys())
 
-class Line():
+class Line:
     def __init__(self):
+        # simple line to structure the questions and ensure easy readability
         line = widgets.HTML("<hr style='border:1px solid #ccc; margin:10px 0;'>")
         display(line)
